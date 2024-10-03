@@ -6,7 +6,9 @@ import 'package:projectfinal/recordstrs.dart';
 import 'package:projectfinal/trsaattendence.dart';
 
 class homepageteacher extends StatefulWidget {
-  const homepageteacher({super.key});
+  final int initialIndex;
+
+  const homepageteacher({super.key, this.initialIndex = 0});
 
   @override
   State<homepageteacher> createState() => _homepageteacherState();
@@ -14,6 +16,20 @@ class homepageteacher extends StatefulWidget {
 
 class _homepageteacherState extends State<homepageteacher> {
   int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex; // Set the initial tab index
+  }
+
+  void _onItemTapped(int index) {
+    if (_selectedIndex != index) {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
+  }
 
   final List<Widget> _tabOptions = [
     HomeTrs(),

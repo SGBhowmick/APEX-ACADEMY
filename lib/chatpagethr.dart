@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:projectfinal/homepage.dart';
+import 'package:projectfinal/hometeacher.dart';
 
 class MessageData {
   String message;
@@ -31,25 +31,22 @@ class MessageData {
   }
 }
 
-class ChatPage extends StatefulWidget {
-  const ChatPage({super.key});
+class ChatPagethrs extends StatefulWidget {
+  const ChatPagethrs({super.key});
 
   @override
-  State<ChatPage> createState() => _ChatPageState();
+  State<ChatPagethrs> createState() => _ChatPagethrsState();
 }
 
-class _ChatPageState extends State<ChatPage> {
-  final String currentUserId = '1yRPk63zD3oNq8OXh6wJ';
-  String? _username;
+class _ChatPagethrsState extends State<ChatPagethrs> {
+  final String adminId = 'LQphDobPX5fZHmGhVDGS';
+  String? _thrsname;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final DatabaseReference _messagesRef =
       FirebaseDatabase.instance.ref().child('messages');
   List<MessageData> messageList = [];
   final TextEditingController _textEditingController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-
-  final String adminId = "LQphDobPX5fZHmGhVDGS";
-  String? _thrsname;
 
   @override
   void initState() {
@@ -62,7 +59,6 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  // Load the teacher's name from Firestore
   Future<void> _loadthrsName() async {
     try {
       DocumentSnapshot doc = await _firestore
@@ -100,22 +96,9 @@ class _ChatPageState extends State<ChatPage> {
           final userData = userDoc.data() as Map<String, dynamic>;
           messageData.username =
               '${userData['firstname']} ${userData['lastname']}';
-          setState(() {
-            _username = messageData.username;
-          });
-          print('Username: ${messageData.username}');
         } else {
-          // For admin messages, use the stored teacher's name
-          if (messageData.userId == adminId) {
-            messageData.username = _thrsname ?? 'Unknown User';
-          } else {
-            messageData.username = 'Unknown User';
-          }
+          messageData.username = 'Unknown User';
         }
-
-        print('Received message');
-        print(
-            'Parsed message data: ${messageData.message}, ${messageData.userId}, ${messageData.username}');
 
         setState(() {
           messageList.add(messageData);
@@ -147,7 +130,7 @@ class _ChatPageState extends State<ChatPage> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => homepagestudent()),
+              MaterialPageRoute(builder: (context) => homepageteacher()),
             );
           },
           icon: Icon(Icons.arrow_back_sharp),
@@ -184,7 +167,7 @@ class _ChatPageState extends State<ChatPage> {
                   var message = messageList[index];
                   var isPreviousSenderSame = index > 0 &&
                       messageList[index - 1].userId == message.userId;
-                  var isCurrentSender = message.userId == currentUserId;
+                  var isCurrentSender = message.userId == adminId;
                   var showName = !isPreviousSenderSame && !isCurrentSender;
 
                   return Align(
@@ -195,9 +178,7 @@ class _ChatPageState extends State<ChatPage> {
                       margin: EdgeInsets.symmetric(vertical: 4, horizontal: 10),
                       padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: isCurrentSender
-                            ? Colors.blue
-                            : const Color.fromARGB(255, 76, 175, 149),
+                        color: isCurrentSender ? Colors.blue : Colors.green,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(
@@ -285,8 +266,8 @@ class _ChatPageState extends State<ChatPage> {
                       if (messageText.isNotEmpty) {
                         _messagesRef.push().set({
                           'message': messageText,
-                          'userId': currentUserId,
-                          'username': _username, // Replace with actual username
+                          'userId': adminId,
+                          'username': _thrsname, // Replace with actual username
                         });
 
                         _textEditingController.clear();

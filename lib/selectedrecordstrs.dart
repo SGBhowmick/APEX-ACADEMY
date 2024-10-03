@@ -22,8 +22,12 @@ class _SelectedrecordstrsState extends State<Selectedrecordstrs> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_sharp, color: Colors.black),
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => homepageteacher()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => homepageteacher(
+                            initialIndex: 1,
+                          )));
             },
           ),
           backgroundColor: Color.fromARGB(255, 229, 224, 172),

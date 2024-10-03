@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:projectfinal/profile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class certiificates extends StatefulWidget {
   const certiificates({super.key});
@@ -9,7 +11,103 @@ class certiificates extends StatefulWidget {
 }
 
 class _certiificatesState extends State<certiificates> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  String userId = '1yRPk63zD3oNq8OXh6wJ';
+
   var crtftscontroller = TextEditingController();
+  String? _profilePicUrl = '';
+  String? _email = "";
+  String? _fname = "";
+  String? _lname = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedData();
+    _loadProfilePic();
+    _loadEmail();
+    _loadName();
+  }
+
+  Future<void> _loadName() async {
+    try {
+      DocumentSnapshot userDoc = await _firestore
+          .collection('profiledetails')
+          .doc(userId)
+          .collection('basicinfo')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          _fname = userDoc['firstname'] ?? 'No firstname';
+          _lname = userDoc['lastname'] ?? 'No lastname';
+        });
+      }
+    } catch (e) {
+      print('Error loading user name: $e');
+    }
+  }
+
+  Future<void> _loadProfilePic() async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('profiledetails').doc(userId).get();
+      if (doc.exists && doc.data() != null) {
+        setState(() {
+          _profilePicUrl = doc['profilepic'] as String?;
+        });
+      }
+    } catch (e) {
+      print('Error loading profile picture: $e');
+    }
+  }
+
+  Future<void> _loadEmail() async {
+    try {
+      DocumentSnapshot userDoc = await _firestore
+          .collection('profiledetails')
+          .doc(userId)
+          .collection('contactinfo')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          _email = userDoc['email'] ?? 'No email';
+        });
+      }
+    } catch (e) {
+      print('Error loading user email: $e');
+    }
+  }
+
+  Future<void> _loadSavedData() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    setState(() {
+      crtftscontroller.text = sharedPreferences.getString('certificates') ?? '';
+    });
+  }
+
+  Future<void> _addProfileDetails(String userId) async {
+    final data = {
+      'certificates': crtftscontroller.text,
+    };
+
+    try {
+      await _firestore
+          .collection('profiledetails')
+          .doc(userId)
+          .collection('certificates')
+          .doc(userId)
+          .set(data, SetOptions(merge: true));
+      print('Profile details added successfully');
+    } catch (e) {
+      print('Error occurred while adding profile details: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,15 +128,15 @@ class _certiificatesState extends State<certiificates> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Text('Name',
+                    child: Text('${_fname ?? ''} ${_lname ?? ''}',
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w500)),
                   ),
-                  Text('email.com', style: TextStyle(fontSize: 18))
+                  Text(_email!, style: TextStyle(fontSize: 18))
                 ],
               ),
               CircleAvatar(
-                backgroundImage: NetworkImage(""),
+                backgroundImage: NetworkImage(_profilePicUrl!),
                 radius: 28,
               ),
             ],
@@ -105,8 +203,8 @@ class _certiificatesState extends State<certiificates> {
                       controller: crtftscontroller,
                       keyboardType: TextInputType.multiline,
                       decoration: InputDecoration(
-                          hintText: 'Achivements',
-                          labelText: 'Achivements:',
+                          hintText: 'certificates',
+                          labelText: 'certificates:',
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                               borderSide: BorderSide(color: Colors.black))),
@@ -157,13 +255,13 @@ class _certiificatesState extends State<certiificates> {
                     child: SizedBox(
                       height: 70,
                       child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
+                            await _addProfileDetails(userId);
+                            print('Profile details saved');
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => Profile(
-                                          crtfts: crtftscontroller.text,
-                                        )));
+                                    builder: (context) => Profile()));
                           },
                           child: Text(
                             "Submit",

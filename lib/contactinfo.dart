@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:projectfinal/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,28 +11,110 @@ class Contactinfo extends StatefulWidget {
 }
 
 class _ContactinfoState extends State<Contactinfo> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  String userId = '1yRPk63zD3oNq8OXh6wJ';
+
   var emailcontroller = TextEditingController();
   var contactnum1controller = TextEditingController();
   var contactnum2controller = TextEditingController();
+  String? _profilePicUrl = '';
+  String? _email = "";
+  String? _fname = "";
+  String? _lname = "";
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    Contactstring();
+    _loadSavedData();
+    _loadProfilePic();
+    _loadEmail();
+    _loadName();
   }
 
-  void Contactstring() async {
+  Future<void> _loadName() async {
+    try {
+      DocumentSnapshot userDoc = await _firestore
+          .collection('profiledetails')
+          .doc(userId)
+          .collection('basicinfo')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          _fname = userDoc['firstname'] ?? 'No firstname';
+          _lname = userDoc['lastname'] ?? 'No lastname';
+        });
+      }
+    } catch (e) {
+      print('Error loading user name: $e');
+    }
+  }
+
+  Future<void> _loadProfilePic() async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('profiledetails').doc(userId).get();
+      if (doc.exists && doc.data() != null) {
+        setState(() {
+          _profilePicUrl = doc['profilepic'] as String?;
+        });
+      }
+    } catch (e) {
+      print('Error loading profile picture: $e');
+    }
+  }
+
+  Future<void> _loadEmail() async {
+    try {
+      DocumentSnapshot userDoc = await _firestore
+          .collection('profiledetails')
+          .doc(userId)
+          .collection('contactinfo')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          _email = userDoc['email'] ?? 'No email';
+        });
+      }
+    } catch (e) {
+      print('Error loading user email: $e');
+    }
+  }
+
+  Future<void> _loadSavedData() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String email = emailcontroller.text;
-    sharedPreferences.setString('email', email);
-    String contactnum1 = contactnum1controller.text;
-    sharedPreferences.setString('ctnum1', contactnum1);
-    String contactnum2 = contactnum2controller.text;
-    sharedPreferences.setString('ctnum2', contactnum2);
-    print(email);
-    print(contactnum1);
-    print(contactnum2);
+
+    setState(() {
+      contactnum1controller.text =
+          sharedPreferences.getString('contact 1') ?? '';
+      contactnum2controller.text =
+          sharedPreferences.getString('contact 2') ?? '';
+      emailcontroller.text = sharedPreferences.getString('email') ?? '';
+    });
+  }
+
+  Future<void> _addProfileDetails(String userId) async {
+    final data = {
+      'email': emailcontroller.text,
+      'contact 1': contactnum1controller.text,
+      'contact 2': contactnum2controller.text,
+    };
+
+    try {
+      await _firestore
+          .collection('profiledetails')
+          .doc(userId)
+          .collection('contactinfo')
+          .doc(userId)
+          .set(data, SetOptions(merge: true));
+      print('Profile details added successfully');
+    } catch (e) {
+      print('Error occurred while adding profile details: $e');
+    }
   }
 
   @override
@@ -53,15 +136,15 @@ class _ContactinfoState extends State<Contactinfo> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Text('Name',
+                    child: Text('${_fname ?? ''} ${_lname ?? ''}',
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w500)),
                   ),
-                  Text('email.com', style: TextStyle(fontSize: 18))
+                  Text(_email!, style: TextStyle(fontSize: 18))
                 ],
               ),
               CircleAvatar(
-                backgroundImage: NetworkImage(""),
+                backgroundImage: NetworkImage(_profilePicUrl!),
                 radius: 28,
               ),
             ],
@@ -218,16 +301,13 @@ class _ContactinfoState extends State<Contactinfo> {
                     child: SizedBox(
                       height: 70,
                       child: ElevatedButton(
-                          onPressed: () {
-                            Contactstring();
+                          onPressed: () async {
+                            await _addProfileDetails(userId);
+                            print('Profile details saved');
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => Profile(
-                                          cnum1: contactnum1controller.text,
-                                          cnum2: contactnum2controller.text,
-                                          email: emailcontroller.text,
-                                        )));
+                                    builder: (context) => Profile()));
                           },
                           child: Text(
                             "Submit",

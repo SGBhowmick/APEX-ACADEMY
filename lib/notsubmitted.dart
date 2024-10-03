@@ -11,13 +11,7 @@ class socialnotsubmited extends StatefulWidget {
 
 class _socialnotsubmitedState extends State<socialnotsubmited> {
   String statusdata = "Not Submitted";
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    submitdata();
-  }
+  List<String> _fileUrls = [];
 
   void submitdata() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -88,9 +82,9 @@ class _socialnotsubmitedState extends State<socialnotsubmited> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Not Submitted",
+                                        "Submitted",
                                         style: TextStyle(
-                                            fontSize: 14, color: Colors.red),
+                                            fontSize: 14, color: Colors.green),
                                       ),
                                       Text(
                                         "Science Role in modern warfare",
@@ -108,207 +102,30 @@ class _socialnotsubmitedState extends State<socialnotsubmited> {
                       ),
                     ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(18.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  "Note -",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 10),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                top: 10,
-                                bottom: 10,
-                              ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("1.",
-                                      style: TextStyle(
-                                          fontSize: 16, color: Colors.black)),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 2),
-                                      child: Expanded(
-                                        child: RichText(
-                                          softWrap: true,
-                                          text: TextSpan(
-                                            children: [
-                                              TextSpan(
-                                                  text: "Research Thoroughly: ",
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.black)),
-                                              TextSpan(
-                                                  text:
-                                                      'Gather information from reliable sources such as books,academic journals and reputable websites',
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color:
-                                                          const Color.fromARGB(
-                                                              255,
-                                                              90,
-                                                              89,
-                                                              89))),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
+                  Expanded(
+                    child: _fileUrls.isEmpty
+                        ? Center(child: Text('No files uploaded yet.'))
+                        : ListView.builder(
+                            itemCount: _fileUrls.length,
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                leading: Icon(Icons.file_copy),
+                                title: Text('File ${index + 1}'),
+                                subtitle: Text(_fileUrls[index]),
+                                onTap: () {
+                                  // Display file
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      content:
+                                          Text('PDF URL: ${_fileUrls[index]}'),
                                     ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                top: 10,
-                                bottom: 10,
-                              ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("2.",
-                                      style: TextStyle(
-                                          fontSize: 16, color: Colors.black)),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 2),
-                                      child: Expanded(
-                                        child: RichText(
-                                          softWrap: true,
-                                          text: TextSpan(
-                                            children: [
-                                              TextSpan(
-                                                  text:
-                                                      "Organize Your Thoughts: ",
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.black)),
-                                              TextSpan(
-                                                  text:
-                                                      'Create a outline to organize your ideas and ensure logical flow in your assignment',
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color:
-                                                          const Color.fromARGB(
-                                                              255,
-                                                              90,
-                                                              89,
-                                                              89))),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                top: 10,
-                                bottom: 10,
-                              ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("3.",
-                                      style: TextStyle(
-                                          fontSize: 16, color: Colors.black)),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 2),
-                                      child: Expanded(
-                                        child: RichText(
-                                          softWrap: true,
-                                          text: TextSpan(
-                                            children: [
-                                              TextSpan(
-                                                  text: "Provide evidence: ",
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.black)),
-                                              TextSpan(
-                                                  text:
-                                                      'Support your arguments with relevant evidence such as data, statistics or examples',
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color:
-                                                          const Color.fromARGB(
-                                                              255,
-                                                              90,
-                                                              89,
-                                                              89))),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                top: 10,
-                                bottom: 10,
-                              ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("4.",
-                                      style: TextStyle(
-                                          fontSize: 16, color: Colors.black)),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 2),
-                                      child: Expanded(
-                                        child: RichText(
-                                          softWrap: true,
-                                          text: TextSpan(
-                                            children: [
-                                              TextSpan(
-                                                  text: "Submit on time: ",
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.black)),
-                                              TextSpan(
-                                                  text:
-                                                      'Make sure to submit your assignment before red light to avoid any penalties',
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color:
-                                                          const Color.fromARGB(
-                                                              255,
-                                                              90,
-                                                              89,
-                                                              89))),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      )
-                    ],
-                  )
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                  ),
                 ],
               ),
             ),
