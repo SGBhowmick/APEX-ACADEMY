@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:projectfinal/selectedsubjectpage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Records extends StatefulWidget {
   const Records({super.key});
@@ -22,6 +23,11 @@ class _RecordsState extends State<Records> {
     "Hindi",
     "Biology"
   ];
+
+  Future<void> _savesub(String subject) async {
+    SharedPreferences selectedSubject = await SharedPreferences.getInstance();
+    selectedSubject.setString('subject', subject);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,10 +66,13 @@ class _RecordsState extends State<Records> {
               itemBuilder: (context, index) {
                 return InkWell(
                   onTap: () {
+                    _savesub(subjects[index]);
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Selectedsubjectpage(),
+                          builder: (context) => Selectedsubjectpage(
+                            subject: subjects[index].toString(),
+                          ),
                         ));
                   },
                   child: GridTile(

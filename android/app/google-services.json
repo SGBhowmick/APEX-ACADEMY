@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "788824510229",
+    "firebase_url": "https://finalproject-3a23c-default-rtdb.firebaseio.com",
+    "project_id": "finalproject-3a23c",
+    "storage_bucket": "finalproject-3a23c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:788824510229:android:a5e78486ce52153219e31c",
+        "android_client_info": {
+          "package_name": "com.acadamy.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBatSTglrflOcj3e_ahfyCEvqAyXA-xI0A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

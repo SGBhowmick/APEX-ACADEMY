@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:projectfinal/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,42 +10,146 @@ class personaldata extends StatefulWidget {
 }
 
 class _personaldataState extends State<personaldata> {
-  var firstnmecontroller = TextEditingController();
-  var lastnmecontroller = TextEditingController();
-  var ncontroller = TextEditingController();
-  var gendercontroller = TextEditingController();
-  var bloodgroupcontroller = TextEditingController();
-  var titlecontroller = TextEditingController();
-  var dobcontroller = TextEditingController();
-  var placebirthcontroller = TextEditingController();
-  var statebirthcontroller = TextEditingController();
-  var religioncontroller = TextEditingController();
-  var heightcontroller = TextEditingController();
-  var weightcontroller = TextEditingController();
-  var mothertonguecontroller = TextEditingController();
-  var castecontroller = TextEditingController();
+  String userId = '1yRPk63zD3oNq8OXh6wJ';
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
+  TextEditingController nationalityController = TextEditingController();
+  TextEditingController genderController = TextEditingController();
+  TextEditingController bloodGroupController = TextEditingController();
+  TextEditingController titleController = TextEditingController();
+  TextEditingController dobController = TextEditingController();
+  TextEditingController placeOfBirthController = TextEditingController();
+  TextEditingController stateOfBirthController = TextEditingController();
+  TextEditingController religionController = TextEditingController();
+  TextEditingController heightController = TextEditingController();
+  TextEditingController weightController = TextEditingController();
+  TextEditingController motherTongueController = TextEditingController();
+  TextEditingController casteController = TextEditingController();
+
+  String? _profilePicUrl = '';
+  String? _email = "";
+  String? _fname = "";
+  String? _lname = "";
+
   @override
   void initState() {
     super.initState();
-    savestring();
+    _loadSavedData();
+    _loadProfilePic();
+    _loadEmail();
+    _loadName();
   }
 
-  void savestring() async {
+  Future<void> _loadName() async {
+    try {
+      DocumentSnapshot userDoc = await _firestore
+          .collection('profiledetails')
+          .doc(userId)
+          .collection('basicinfo')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          _fname = userDoc['firstname'] ?? 'No firstname';
+          _lname = userDoc['lastname'] ?? 'No lastname';
+        });
+      }
+    } catch (e) {
+      print('Error loading user name: $e');
+    }
+  }
+
+  Future<void> _loadProfilePic() async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('profiledetails').doc(userId).get();
+      if (doc.exists && doc.data() != null) {
+        setState(() {
+          _profilePicUrl = doc['profilepic'] as String?;
+        });
+      }
+    } catch (e) {
+      print('Error loading profile picture: $e');
+    }
+  }
+
+  Future<void> _loadEmail() async {
+    try {
+      DocumentSnapshot userDoc = await _firestore
+          .collection('profiledetails')
+          .doc(userId)
+          .collection('contactinfo')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          _email = userDoc['email'] ?? 'No email';
+        });
+      }
+    } catch (e) {
+      print('Error loading user email: $e');
+    }
+  }
+
+  Future<void> _loadSavedData() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.setString('nationality', ncontroller.text);
-    sharedPreferences.setString('firstname', firstnmecontroller.text);
-    sharedPreferences.setString('lastname', lastnmecontroller.text);
-    sharedPreferences.setString('gender', gendercontroller.text);
-    sharedPreferences.setString('bloodgroup', bloodgroupcontroller.text);
-    sharedPreferences.setString('title', titlecontroller.text);
-    sharedPreferences.setString('dob', dobcontroller.text);
-    sharedPreferences.setString('placebirth', placebirthcontroller.text);
-    sharedPreferences.setString('statebirth', statebirthcontroller.text);
-    sharedPreferences.setString('religion', religioncontroller.text);
-    sharedPreferences.setString('height', heightcontroller.text);
-    sharedPreferences.setString('weight', weightcontroller.text);
-    sharedPreferences.setString('mothertongue', mothertonguecontroller.text);
-    sharedPreferences.setString('caste', castecontroller.text);
+
+    setState(() {
+      nationalityController.text =
+          sharedPreferences.getString('nationality') ?? '';
+      firstNameController.text = sharedPreferences.getString('firstname') ?? '';
+      lastNameController.text = sharedPreferences.getString('lastname') ?? '';
+      genderController.text = sharedPreferences.getString('gender') ?? '';
+      bloodGroupController.text =
+          sharedPreferences.getString('bloodgroup') ?? '';
+      titleController.text = sharedPreferences.getString('title') ?? '';
+      dobController.text = sharedPreferences.getString('dob') ?? '';
+      placeOfBirthController.text =
+          sharedPreferences.getString('placebirth') ?? '';
+      stateOfBirthController.text =
+          sharedPreferences.getString('statebirth') ?? '';
+      religionController.text = sharedPreferences.getString('religion') ?? '';
+      heightController.text = sharedPreferences.getString('height') ?? '';
+      weightController.text = sharedPreferences.getString('weight') ?? '';
+      motherTongueController.text =
+          sharedPreferences.getString('mothertongue') ?? '';
+      casteController.text = sharedPreferences.getString('caste') ?? '';
+    });
+  }
+
+  Future<void> _addProfileDetails(String userId) async {
+    final data = {
+      'nationality': nationalityController.text,
+      'firstname': firstNameController.text,
+      'lastname': lastNameController.text,
+      'gender': genderController.text,
+      'bloodgroup': bloodGroupController.text,
+      'title': titleController.text,
+      'dob': dobController.text,
+      'placebirth': placeOfBirthController.text,
+      'statebirth': stateOfBirthController.text,
+      'religion': religionController.text,
+      'height': heightController.text,
+      'weight': weightController.text,
+      'mothertongue': motherTongueController.text,
+      'caste': casteController.text,
+    };
+
+    try {
+      await _firestore
+          .collection('profiledetails')
+          .doc(userId)
+          .collection('basicinfo')
+          .doc(userId)
+          .set(data, SetOptions(merge: true));
+      print('Profile details added successfully');
+    } catch (e) {
+      print('Error occurred while adding profile details: $e');
+    }
   }
 
   @override
@@ -66,15 +171,15 @@ class _personaldataState extends State<personaldata> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Text('Name',
+                    child: Text('${_fname ?? ''} ${_lname ?? ''}',
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w500)),
                   ),
-                  Text('email.com', style: TextStyle(fontSize: 18))
+                  Text(_email!, style: TextStyle(fontSize: 18))
                 ],
               ),
               CircleAvatar(
-                backgroundImage: NetworkImage(""),
+                backgroundImage: NetworkImage(_profilePicUrl!),
                 radius: 28,
               ),
             ],
@@ -133,7 +238,7 @@ class _personaldataState extends State<personaldata> {
                 padding: const EdgeInsets.only(
                     top: 18.0, left: 18.0, bottom: 18, right: 198),
                 child: TextField(
-                  controller: titlecontroller,
+                  controller: titleController,
                   decoration: InputDecoration(
                       hintText: 'Title',
                       labelText: 'Title:',
@@ -150,7 +255,7 @@ class _personaldataState extends State<personaldata> {
                           top: 8.0, left: 18.0, bottom: 18, right: 10),
                       child: TextField(
                         keyboardType: TextInputType.name,
-                        controller: firstnmecontroller,
+                        controller: firstNameController,
                         decoration: InputDecoration(
                             hintText: 'First Name',
                             labelText: 'First Name:',
@@ -166,7 +271,7 @@ class _personaldataState extends State<personaldata> {
                           top: 8.0, right: 18.0, bottom: 18, left: 10),
                       child: TextField(
                         keyboardType: TextInputType.name,
-                        controller: lastnmecontroller,
+                        controller: lastNameController,
                         decoration: InputDecoration(
                             hintText: 'last Name',
                             labelText: 'last Name:',
@@ -186,7 +291,7 @@ class _personaldataState extends State<personaldata> {
                           top: 8.0, left: 18.0, bottom: 18, right: 10),
                       child: TextField(
                         keyboardType: TextInputType.datetime,
-                        controller: dobcontroller,
+                        controller: dobController,
                         decoration: InputDecoration(
                             hintText: 'DOB',
                             labelText: 'DOB:',
@@ -201,7 +306,7 @@ class _personaldataState extends State<personaldata> {
                       padding: const EdgeInsets.only(
                           top: 8.0, right: 18.0, bottom: 18, left: 10),
                       child: TextField(
-                        controller: gendercontroller,
+                        controller: genderController,
                         decoration: InputDecoration(
                             hintText: 'Gender',
                             labelText: 'Gender:',
@@ -220,7 +325,7 @@ class _personaldataState extends State<personaldata> {
                       padding: const EdgeInsets.only(
                           top: 8.0, left: 18.0, bottom: 18, right: 10),
                       child: TextField(
-                        controller: ncontroller,
+                        controller: nationalityController,
                         decoration: InputDecoration(
                             hintText: 'Natonality',
                             labelText: 'Natonality:',
@@ -235,7 +340,7 @@ class _personaldataState extends State<personaldata> {
                       padding: const EdgeInsets.only(
                           top: 8.0, right: 18.0, bottom: 18, left: 10),
                       child: TextField(
-                        controller: bloodgroupcontroller,
+                        controller: bloodGroupController,
                         decoration: InputDecoration(
                             hintText: 'Blood Group',
                             labelText: 'Blood Group:',
@@ -269,7 +374,7 @@ class _personaldataState extends State<personaldata> {
                       padding: const EdgeInsets.only(
                           top: 18.0, left: 18.0, bottom: 18, right: 198),
                       child: TextField(
-                        controller: placebirthcontroller,
+                        controller: placeOfBirthController,
                         decoration: InputDecoration(
                             hintText: 'Place of Birth',
                             labelText: 'Place of Birth:',
@@ -288,7 +393,7 @@ class _personaldataState extends State<personaldata> {
                       padding: const EdgeInsets.only(
                           top: 8.0, left: 18.0, bottom: 18, right: 10),
                       child: TextField(
-                        controller: statebirthcontroller,
+                        controller: stateOfBirthController,
                         decoration: InputDecoration(
                             hintText: 'State of Birth',
                             labelText: 'State of Birth:',
@@ -303,7 +408,7 @@ class _personaldataState extends State<personaldata> {
                       padding: const EdgeInsets.only(
                           top: 8.0, right: 18.0, bottom: 18, left: 10),
                       child: TextField(
-                        controller: religioncontroller,
+                        controller: religionController,
                         decoration: InputDecoration(
                             hintText: 'Religion',
                             labelText: 'Religion:',
@@ -323,7 +428,7 @@ class _personaldataState extends State<personaldata> {
                           top: 8.0, left: 18.0, bottom: 18, right: 10),
                       child: TextField(
                         keyboardType: TextInputType.number,
-                        controller: heightcontroller,
+                        controller: heightController,
                         decoration: InputDecoration(
                             hintText: 'Height (in cm)',
                             labelText: 'Height (in cm):',
@@ -339,7 +444,7 @@ class _personaldataState extends State<personaldata> {
                           top: 8.0, right: 18.0, bottom: 18, left: 10),
                       child: TextField(
                         keyboardType: TextInputType.number,
-                        controller: weightcontroller,
+                        controller: weightController,
                         decoration: InputDecoration(
                             hintText: 'Weight (in kg)',
                             labelText: 'Weight (in kg):',
@@ -358,7 +463,7 @@ class _personaldataState extends State<personaldata> {
                       padding: const EdgeInsets.only(
                           top: 8.0, left: 18.0, bottom: 18, right: 10),
                       child: TextField(
-                        controller: mothertonguecontroller,
+                        controller: motherTongueController,
                         decoration: InputDecoration(
                             hintText: 'Mother Tongue',
                             labelText: 'Mother Tongue:',
@@ -373,7 +478,7 @@ class _personaldataState extends State<personaldata> {
                       padding: const EdgeInsets.only(
                           top: 8.0, right: 18.0, bottom: 18, left: 10),
                       child: TextField(
-                        controller: castecontroller,
+                        controller: casteController,
                         decoration: InputDecoration(
                             hintText: 'Caste',
                             labelText: 'Caste:',
@@ -485,27 +590,13 @@ class _personaldataState extends State<personaldata> {
                     child: SizedBox(
                       height: 70,
                       child: ElevatedButton(
-                          onPressed: () {
-                            savestring();
+                          onPressed: () async {
+                            await _addProfileDetails(userId);
+                            print('Profile details saved');
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => Profile(
-                                    fname: firstnmecontroller.text,
-                                    lname: lastnmecontroller.text,
-                                    nationality: ncontroller.text,
-                                    gender: gendercontroller.text,
-                                    bldgrp: bloodgroupcontroller.text,
-                                    tle: titlecontroller.text,
-                                    dob: dobcontroller.text,
-                                    pbc: placebirthcontroller.text,
-                                    sbc: statebirthcontroller.text,
-                                    rlgn: religioncontroller.text,
-                                    hght: heightcontroller.text,
-                                    wght: weightcontroller.text,
-                                    mgtc: mothertonguecontroller.text,
-                                    caste: castecontroller.text,
-                                  ),
+                                  builder: (context) => Profile(),
                                 ));
                           },
                           child: Text(

@@ -6,7 +6,9 @@ import 'package:projectfinal/home.dart';
 import 'package:projectfinal/records.dart';
 
 class homepagestudent extends StatefulWidget {
-  const homepagestudent({super.key});
+  final int initialIndex;
+
+  const homepagestudent({super.key, this.initialIndex = 0});
 
   @override
   State<homepagestudent> createState() => _homepagestudentState();
@@ -15,6 +17,20 @@ class homepagestudent extends StatefulWidget {
 class _homepagestudentState extends State<homepagestudent> {
   int _selectedIndex = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex; // Set the initial tab index
+  }
+
+  void _onItemTapped(int index) {
+    if (_selectedIndex != index) {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
+  }
+
   final List<Widget> _tabOptions = [Home(), Records(), Attendence(), Events()];
 
   @override
@@ -22,7 +38,8 @@ class _homepagestudentState extends State<homepagestudent> {
     return Scaffold(
       body: _tabOptions.elementAt(_selectedIndex),
       bottomNavigationBar: CustomLineIndicatorBottomNavbar(
-        selectedColor: Color.fromARGB(255, 176, 150, 6),
+        selectedColor: Color.fromARGB(255, 216, 185, 8),
+        splashColor: Colors.amberAccent,
         unSelectedColor: Colors.black54,
         backgroundColor: Colors.white,
         currentIndex: _selectedIndex,
@@ -38,24 +55,24 @@ class _homepagestudentState extends State<homepagestudent> {
         },
         customBottomBarItems: [
           CustomBottomBarItems(
+            assetsImagePath: "assets/icons/home.png",
             label: 'Home',
-            icon: (Icons.home),
-            isAssetsImage: false,
+            isAssetsImage: true,
           ),
           CustomBottomBarItems(
             label: 'Records',
-            icon: Icons.import_contacts_outlined,
-            isAssetsImage: false,
+            assetsImagePath: "assets/icons/book.png",
+            isAssetsImage: true,
           ),
           CustomBottomBarItems(
             label: 'Attendence',
-            icon: Icons.check_circle_outline,
-            isAssetsImage: false,
+            assetsImagePath: "assets/icons/attendance.png",
+            isAssetsImage: true,
           ),
           CustomBottomBarItems(
             label: 'Events',
-            icon: Icons.calendar_today_rounded,
-            isAssetsImage: false,
+            assetsImagePath: "assets/icons/events.png",
+            isAssetsImage: true,
           ),
         ],
       ),

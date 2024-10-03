@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:projectfinal/loginpage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class page1 extends StatefulWidget {
   const page1({
@@ -11,7 +12,13 @@ class page1 extends StatefulWidget {
 }
 
 class _page1State extends State<page1> {
-  var selectedprofile = "";
+  String selectedprofile = "";
+
+  void _saveProfile() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString('sprofile', selectedprofile);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +43,11 @@ class _page1State extends State<page1> {
               width: 250,
               child: ElevatedButton(
                   style: ButtonStyle(
-                      elevation: WidgetStatePropertyAll(4),
+                      overlayColor: WidgetStatePropertyAll(
+                          const Color.fromARGB(255, 233, 255, 208)),
+                      surfaceTintColor: WidgetStatePropertyAll(Colors.orange),
+                      backgroundColor: WidgetStatePropertyAll(Colors.white),
+                      elevation: WidgetStatePropertyAll(3),
                       shape: WidgetStatePropertyAll(RoundedRectangleBorder(
                           side: BorderSide(
                               color: const Color.fromARGB(255, 227, 226, 226)),
@@ -44,13 +55,12 @@ class _page1State extends State<page1> {
                   onPressed: () {
                     setState(() {
                       selectedprofile = "teacher";
+                      _saveProfile();
                     });
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Loginpage(
-                            sprofile: selectedprofile,
-                          ),
+                          builder: (context) => LoginPage(),
                         ));
                   },
                   child: Text(
@@ -66,7 +76,11 @@ class _page1State extends State<page1> {
               width: 250,
               child: ElevatedButton(
                   style: ButtonStyle(
-                      elevation: WidgetStatePropertyAll(4),
+                      overlayColor: WidgetStatePropertyAll(
+                          const Color.fromARGB(255, 233, 255, 208)),
+                      surfaceTintColor: WidgetStatePropertyAll(Colors.orange),
+                      backgroundColor: WidgetStatePropertyAll(Colors.white),
+                      elevation: WidgetStatePropertyAll(3),
                       shape: WidgetStatePropertyAll(RoundedRectangleBorder(
                           side: BorderSide(
                               color: const Color.fromARGB(255, 227, 226, 226)),
@@ -74,13 +88,12 @@ class _page1State extends State<page1> {
                   onPressed: () {
                     setState(() {
                       selectedprofile = "student";
+                      _saveProfile();
                     });
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Loginpage(
-                            sprofile: selectedprofile,
-                          ),
+                          builder: (context) => LoginPage(),
                         ));
                   },
                   child: Text(

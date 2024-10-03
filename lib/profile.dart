@@ -1,5 +1,11 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
 import 'package:projectfinal/achivements.dart';
 import 'package:projectfinal/address.dart';
 import 'package:projectfinal/basicinfo.dart';
@@ -7,62 +13,265 @@ import 'package:projectfinal/certiificates.dart';
 import 'package:projectfinal/contactinfo.dart';
 import 'package:projectfinal/homepage.dart';
 import 'package:projectfinal/loginscreen.dart';
+import 'package:projectfinal/shareddata.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore: must_be_immutable
 class Profile extends StatefulWidget {
-  String? fname,
-      lname,
-      nationality,
-      gender,
-      bldgrp,
-      tle,
-      dob,
-      pbc,
-      sbc,
-      rlgn,
-      wght,
-      hght,
-      mgtc,
-      caste,
-      email,
-      cnum1,
-      cnum2,
-      adrs,
-      achmts,
-      crtfts;
-
-  Profile(
-      {super.key,
-      this.fname,
-      this.lname,
-      this.nationality,
-      this.gender,
-      this.bldgrp,
-      this.tle,
-      this.dob,
-      this.pbc,
-      this.sbc,
-      this.rlgn,
-      this.wght,
-      this.hght,
-      this.mgtc,
-      this.caste,
-      this.email,
-      this.cnum1,
-      this.cnum2,
-      this.adrs,
-      this.achmts,
-      this.crtfts});
+  Profile({
+    super.key,
+  });
 
   @override
   State<Profile> createState() => _ProfileState();
 }
 
 class _ProfileState extends State<Profile> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  File? _photo;
+  final ImagePicker _picker = ImagePicker();
+  String? _profilePicUrl;
+  String? _email = "";
+  String? _firstname = "";
+  String? _lastname = '';
+  String? _title = '';
+  String? _dob = '';
+  String? _placebirth = '';
+  String? _statebirth = '';
+  String? _religion = '';
+  String? _height = '';
+  String? _weight = '';
+  String? _mothertongue = '';
+  String? _caste = '';
+  String? _nationality = '';
+  String? _gender = '';
+  String? _bldgrp = '';
+  String? _address = '';
+  String? _certificates = '';
+  String? _achievements = '';
+  String? _contact1 = '';
+  String? _contact2 = '';
+
+  @override
+  void initState() {
+    super.initState();
+    ProfileDetails().initializeProfile();
+    _loadString();
+    _loadProfilePic();
+    _loadEmail();
+    _loadName();
+  }
+
+  Future<void> _loadString() async {
+    // Obtain an instance of SharedPreferences
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    // Load data
+    String nationality = sharedPreferences.getString('nationality') ?? '';
+    String firstName = sharedPreferences.getString('firstname') ?? '';
+    String lastName = sharedPreferences.getString('lastname') ?? '';
+    String gender = sharedPreferences.getString('gender') ?? '';
+    String bloodGroup = sharedPreferences.getString('bloodgroup') ?? '';
+    String title = sharedPreferences.getString('title') ?? '';
+    String dob = sharedPreferences.getString('dob') ?? '';
+    String placeOfBirth = sharedPreferences.getString('placebirth') ?? '';
+    String stateOfBirth = sharedPreferences.getString('statebirth') ?? '';
+    String religion = sharedPreferences.getString('religion') ?? '';
+    String height = sharedPreferences.getString('height') ?? '';
+    String weight = sharedPreferences.getString('weight') ?? '';
+    String motherTongue = sharedPreferences.getString('mothertongue') ?? '';
+    String caste = sharedPreferences.getString('caste') ?? '';
+    String email = sharedPreferences.getString('email') ?? '';
+    String contactNum1 = sharedPreferences.getString('contact 1') ?? '';
+    String contactNum2 = sharedPreferences.getString('contact 2') ?? '';
+    String address = sharedPreferences.getString('address') ?? '';
+    String certificates = sharedPreferences.getString('certificates') ?? '';
+    String achievements = sharedPreferences.getString('achievements') ?? '';
+    String profilePicUrl = sharedPreferences.getString('profilepic') ?? '';
+
+    // Populate the controllers with the loaded data
+    _nationality = nationality;
+    _firstname = firstName;
+    _lastname = lastName;
+    _gender = gender;
+    _bldgrp = bloodGroup;
+    _title = title;
+    _dob = dob;
+    _placebirth = placeOfBirth;
+    _statebirth = stateOfBirth;
+    _religion = religion;
+    _height = height;
+    _weight = weight;
+    _mothertongue = motherTongue;
+    _caste = caste;
+    _address = address;
+    _certificates = certificates;
+    _achievements = achievements;
+    _contact1 = contactNum1;
+    _contact2 = contactNum2;
+    _email = email;
+
+    _profilePicUrl = profilePicUrl;
+
+    print('Profile information loaded from SharedPreferences');
+  }
+
+  Future<void> _loadProfilePic() async {
+    String userId = '1yRPk63zD3oNq8OXh6wJ';
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('profiledetails').doc(userId).get();
+      if (doc.exists && doc.data() != null) {
+        setState(() {
+          _profilePicUrl = doc['profilepic'] as String?;
+        });
+      }
+    } catch (e) {
+      print('Error loading profile picture: $e');
+    }
+  }
+
+  Future<void> _loadEmail() async {
+    String userId = '1yRPk63zD3oNq8OXh6wJ';
+    try {
+      DocumentSnapshot userDoc = await _firestore
+          .collection('profiledetails')
+          .doc(userId)
+          .collection('contactinfo')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          _email = userDoc['email'] ?? 'No email';
+        });
+      }
+    } catch (e) {
+      print('Error loading user email: $e');
+    }
+  }
+
+  Future<void> _loadName() async {
+    String userId = '1yRPk63zD3oNq8OXh6wJ';
+    try {
+      DocumentSnapshot userDoc = await _firestore
+          .collection('profiledetails')
+          .doc(userId)
+          .collection('basicinfo')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          _firstname = userDoc['firstname'] ?? 'No firstname';
+          _lastname = userDoc['lastname'] ?? 'No lastname';
+        });
+      }
+    } catch (e) {
+      print('Error loading user name: $e');
+    }
+  }
+
+  Future<void> _updateProfileDetails() async {
+    if (_photo == null) {
+      print('No photo selected');
+      return;
+    }
+    final photoUrl = await _uploadFile();
+    if (photoUrl.isEmpty) {
+      print('Failed to upload photo');
+      return;
+    }
+
+    String userId = '1yRPk63zD3oNq8OXh6wJ';
+    final data = {
+      'profilepic': photoUrl,
+    };
+
+    try {
+      await _firestore.collection('profiledetails').doc(userId).update(data);
+      print('Profile details updated successfully');
+      setState(() {
+        _profilePicUrl = photoUrl;
+      });
+    } catch (e) {
+      print('Error occurred while updating profile details: $e');
+    }
+  }
+
+  Future<void> _imgFromGallery() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _photo = File(pickedFile.path);
+      });
+      await _updateProfileDetails();
+    } else {
+      print('No image selected.');
+    }
+  }
+
+  Future<void> _imgFromCamera() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      setState(() {
+        _photo = File(pickedFile.path);
+      });
+      await _updateProfileDetails();
+    } else {
+      print('No image selected.');
+    }
+  }
+
+  Future<String> _uploadFile() async {
+    if (_photo == null) return '';
+    final fileName = basename(_photo!.path);
+    final destination = 'profilepic/$fileName';
+
+    try {
+      final ref = firebase_storage.FirebaseStorage.instance.ref(destination);
+      await ref.putFile(_photo!);
+      return await ref.getDownloadURL();
+    } catch (e) {
+      print('Error occurred while uploading file: $e');
+      return '';
+    }
+  }
+
+  void _showPicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext bc) {
+        return SafeArea(
+          child: Container(
+            child: Wrap(
+              children: <Widget>[
+                ListTile(
+                  leading: Icon(Icons.photo_library),
+                  title: Text('Gallery'),
+                  onTap: () {
+                    _imgFromGallery();
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.photo_camera),
+                  title: Text('Camera'),
+                  onTap: () {
+                    _imgFromCamera();
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 248, 247, 247),
       appBar: AppBar(
           leading: IconButton(
               onPressed: () {
@@ -73,8 +282,9 @@ class _ProfileState extends State<Profile> {
           backgroundColor: Color.fromARGB(255, 248, 247, 247),
           title: const Text('Profile',
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500))),
+      backgroundColor: Color.fromARGB(255, 248, 247, 247),
       body: Padding(
-        padding: const EdgeInsets.only(left: 18.0, right: 18.0),
+        padding: const EdgeInsets.only(left: 18.0, right: 18.0, bottom: 18.0),
         child: SingleChildScrollView(
           child: Column(children: [
             Padding(
@@ -88,16 +298,24 @@ class _ProfileState extends State<Profile> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(bottom: 8.0),
-                        child: Text('Name',
+                        child: Text('${_firstname ?? ''} ${_lastname ?? ''}',
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.w500)),
                       ),
-                      Text('email.com', style: TextStyle(fontSize: 18))
+                      Text(_email.toString(), style: TextStyle(fontSize: 18))
                     ],
                   ),
-                  CircleAvatar(
-                    backgroundImage: NetworkImage(""),
-                    radius: 28,
+                  GestureDetector(
+                    onTap: () => _showPicker(context),
+                    child: CircleAvatar(
+                      backgroundImage: _profilePicUrl != null
+                          ? NetworkImage(_profilePicUrl!)
+                          : null,
+                      child: _profilePicUrl == null
+                          ? Icon(Icons.person, size: 28, color: Colors.grey)
+                          : null,
+                      radius: 28,
+                    ),
                   ),
                 ],
               ),
@@ -193,7 +411,7 @@ class _ProfileState extends State<Profile> {
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.start,
                                                   children: [
-                                                    Text("${widget.tle}"),
+                                                    Text(_title!),
                                                   ],
                                                 ),
                                               ),
@@ -225,7 +443,7 @@ class _ProfileState extends State<Profile> {
                                               Expanded(
                                                 child: Row(
                                                   children: [
-                                                    Text("${widget.fname}"),
+                                                    Text(_firstname!),
                                                   ],
                                                 ),
                                               ),
@@ -256,9 +474,7 @@ class _ProfileState extends State<Profile> {
                                               ),
                                               Expanded(
                                                 child: Row(
-                                                  children: [
-                                                    Text("${widget.lname}")
-                                                  ],
+                                                  children: [Text(_lastname!)],
                                                 ),
                                               ),
                                             ],
@@ -288,9 +504,7 @@ class _ProfileState extends State<Profile> {
                                               ),
                                               Expanded(
                                                 child: Row(
-                                                  children: [
-                                                    Text("${widget.dob}")
-                                                  ],
+                                                  children: [Text(_dob!)],
                                                 ),
                                               ),
                                             ],
@@ -320,9 +534,7 @@ class _ProfileState extends State<Profile> {
                                               ),
                                               Expanded(
                                                 child: Row(
-                                                  children: [
-                                                    Text("${widget.gender}")
-                                                  ],
+                                                  children: [Text(_gender!)],
                                                 ),
                                               ),
                                             ],
@@ -353,8 +565,7 @@ class _ProfileState extends State<Profile> {
                                               Expanded(
                                                 child: Row(
                                                   children: [
-                                                    Text(
-                                                        "${widget.nationality}")
+                                                    Text(_nationality!)
                                                   ],
                                                 ),
                                               ),
@@ -385,9 +596,7 @@ class _ProfileState extends State<Profile> {
                                               ),
                                               Expanded(
                                                 child: Row(
-                                                  children: [
-                                                    Text("${widget.bldgrp}")
-                                                  ],
+                                                  children: [Text(_bldgrp!)],
                                                 ),
                                               ),
                                             ],
@@ -418,7 +627,7 @@ class _ProfileState extends State<Profile> {
                                               Expanded(
                                                 child: Row(
                                                   children: [
-                                                    Text("${widget.pbc}")
+                                                    Text(_placebirth!)
                                                   ],
                                                 ),
                                               ),
@@ -450,7 +659,7 @@ class _ProfileState extends State<Profile> {
                                               Expanded(
                                                 child: Row(
                                                   children: [
-                                                    Text("${widget.sbc}")
+                                                    Text(_statebirth!)
                                                   ],
                                                 ),
                                               ),
@@ -481,9 +690,7 @@ class _ProfileState extends State<Profile> {
                                               ),
                                               Expanded(
                                                 child: Row(
-                                                  children: [
-                                                    Text("${widget.rlgn}")
-                                                  ],
+                                                  children: [Text(_religion!)],
                                                 ),
                                               ),
                                             ],
@@ -513,9 +720,7 @@ class _ProfileState extends State<Profile> {
                                               ),
                                               Expanded(
                                                 child: Row(
-                                                  children: [
-                                                    Text("${widget.hght}")
-                                                  ],
+                                                  children: [Text(_height!)],
                                                 ),
                                               ),
                                             ],
@@ -545,9 +750,7 @@ class _ProfileState extends State<Profile> {
                                               ),
                                               Expanded(
                                                 child: Row(
-                                                  children: [
-                                                    Text("${widget.wght}")
-                                                  ],
+                                                  children: [Text(_weight!)],
                                                 ),
                                               ),
                                             ],
@@ -578,7 +781,7 @@ class _ProfileState extends State<Profile> {
                                               Expanded(
                                                 child: Row(
                                                   children: [
-                                                    Text("${widget.mgtc}")
+                                                    Text(_mothertongue!)
                                                   ],
                                                 ),
                                               ),
@@ -609,9 +812,7 @@ class _ProfileState extends State<Profile> {
                                               ),
                                               Expanded(
                                                 child: Row(
-                                                  children: [
-                                                    Text("${widget.caste}")
-                                                  ],
+                                                  children: [Text(_caste!)],
                                                 ),
                                               ),
                                             ],
@@ -723,7 +924,7 @@ class _ProfileState extends State<Profile> {
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.start,
                                                   children: [
-                                                    Text("${widget.email}"),
+                                                    Text(_email!),
                                                   ],
                                                 ),
                                               ),
@@ -755,7 +956,7 @@ class _ProfileState extends State<Profile> {
                                               Expanded(
                                                 child: Row(
                                                   children: [
-                                                    Text("${widget.cnum1}"),
+                                                    Text(_contact1!),
                                                   ],
                                                 ),
                                               ),
@@ -786,9 +987,7 @@ class _ProfileState extends State<Profile> {
                                               ),
                                               Expanded(
                                                 child: Row(
-                                                  children: [
-                                                    Text("${widget.cnum2}")
-                                                  ],
+                                                  children: [Text(_contact2!)],
                                                 ),
                                               ),
                                             ],
@@ -912,7 +1111,7 @@ class _ProfileState extends State<Profile> {
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.start,
                                                   children: [
-                                                    Text("${widget.adrs}"),
+                                                    Text(_address!),
                                                   ],
                                                 ),
                                               ),
@@ -1040,8 +1239,8 @@ class _ProfileState extends State<Profile> {
                                                     MainAxisAlignment.start,
                                                 children: [
                                                   Expanded(
-                                                      child: Text(
-                                                          "${widget.achmts}")),
+                                                      child:
+                                                          Text(_achievements!)),
                                                 ],
                                               ),
                                             ),
@@ -1158,8 +1357,8 @@ class _ProfileState extends State<Profile> {
                                                     MainAxisAlignment.start,
                                                 children: [
                                                   Expanded(
-                                                      child: Text(
-                                                          "${widget.crtfts}")),
+                                                      child:
+                                                          Text(_certificates!)),
                                                 ],
                                               ),
                                             ),
