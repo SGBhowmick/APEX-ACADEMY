@@ -2,22 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:projectfinal/assignments.dart';
 import 'package:projectfinal/homepage.dart';
 import 'package:projectfinal/lab.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Selectedsubjectpage extends StatefulWidget {
-  Selectedsubjectpage({super.key, this.subject});
-  final String? subject;
+class SelectedSubjectPage extends StatefulWidget {
+  const SelectedSubjectPage({Key? key}) : super(key: key);
 
   @override
-  State<Selectedsubjectpage> createState() => _SelectedsubjectpageState();
+  State<SelectedSubjectPage> createState() => _SelectedSubjectPageState();
 }
 
-class _SelectedsubjectpageState extends State<Selectedsubjectpage> {
-  late String subject; // Use late to ensure it's initialized before use
+class _SelectedSubjectPageState extends State<SelectedSubjectPage> {
+  String subjects = '';
 
   @override
   void initState() {
     super.initState();
-    subject = widget.subject ?? "All"; // Provide a default value if null
+    _getSelectedSubject();
+  }
+
+  Future<void> _getSelectedSubject() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      subjects = prefs.getString('subject') ?? '';
+    });
   }
 
   @override
@@ -32,25 +39,26 @@ class _SelectedsubjectpageState extends State<Selectedsubjectpage> {
             icon: const Icon(Icons.arrow_back_sharp, color: Colors.black),
             onPressed: () {
               Navigator.push(
-                  context,
+                  (context),
                   MaterialPageRoute(
-                      builder: (context) =>
-                          homepagestudent())); // Use pop to go back
+                      builder: (context) => homepagestudent(
+                            initialIndex: 1,
+                          ))); // Use pop to go back
             },
           ),
-          backgroundColor: Color.fromARGB(255, 229, 224, 172),
+          backgroundColor: const Color.fromARGB(255, 229, 224, 172),
           title: Text(
-            subject,
+            subjects,
             style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
           ),
           bottom: PreferredSize(
-            preferredSize: Size.fromHeight(100),
+            preferredSize: const Size.fromHeight(100),
             child: TabBar(
               indicatorSize: TabBarIndicatorSize.tab,
               indicatorWeight: 6,
-              indicatorPadding: EdgeInsets.only(left: 20, right: 20),
-              indicatorColor: Color.fromARGB(255, 158, 124, 20),
-              tabs: [
+              indicatorPadding: const EdgeInsets.symmetric(horizontal: 20),
+              indicatorColor: const Color.fromARGB(255, 158, 124, 20),
+              tabs: const [
                 Tab(
                   child: Text(
                     "Assignments",
@@ -67,7 +75,7 @@ class _SelectedsubjectpageState extends State<Selectedsubjectpage> {
             ),
           ),
         ),
-        body: TabBarView(
+        body: const TabBarView(
           children: [
             Assignments(),
             lab(),

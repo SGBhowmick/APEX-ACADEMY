@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:projectfinal/assignmentstrs.dart';
 import 'package:projectfinal/hometeacher.dart';
 import 'package:projectfinal/labtrs.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Selectedrecordstrs extends StatefulWidget {
   const Selectedrecordstrs({super.key});
@@ -11,6 +12,21 @@ class Selectedrecordstrs extends StatefulWidget {
 }
 
 class _SelectedrecordstrsState extends State<Selectedrecordstrs> {
+  String subjects = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getSelectedSubject();
+  }
+
+  Future<void> _getSelectedSubject() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      subjects = prefs.getString('subjecttrs') ?? '';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -31,7 +47,7 @@ class _SelectedrecordstrsState extends State<Selectedrecordstrs> {
             },
           ),
           backgroundColor: Color.fromARGB(255, 229, 224, 172),
-          title: const Text('Social',
+          title: Text(subjects,
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500)),
           bottom: PreferredSize(
             preferredSize: Size.fromHeight(100),

@@ -29,7 +29,7 @@ class _socialnotsubmitedState extends State<socialnotsubmited> {
         leading: IconButton(
           onPressed: () {
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => Selectedsubjectpage()));
+                MaterialPageRoute(builder: (context) => SelectedSubjectPage()));
           },
           icon: Icon(Icons.arrow_back),
         ),
@@ -173,7 +173,7 @@ class _socialnotsubmitedState extends State<socialnotsubmited> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => Selectedsubjectpage()));
+                              builder: (context) => SelectedSubjectPage()));
                     },
                     child: Text(
                       "Upload",

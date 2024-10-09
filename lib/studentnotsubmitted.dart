@@ -37,7 +37,7 @@ class _notSubmittedState extends State<notSubmitted> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => Selectedsubjectpage()),
+              MaterialPageRoute(builder: (context) => SelectedSubjectPage()),
             );
           },
         ),
@@ -194,7 +194,7 @@ class _notSubmittedState extends State<notSubmitted> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Selectedsubjectpage(),
+                          builder: (context) => SelectedSubjectPage(),
                         ),
                       );
                     },

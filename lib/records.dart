@@ -70,9 +70,7 @@ class _RecordsState extends State<Records> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Selectedsubjectpage(
-                            subject: subjects[index].toString(),
-                          ),
+                          builder: (context) => SelectedSubjectPage(),
                         ));
                   },
                   child: GridTile(
@@ -95,7 +93,6 @@ class _RecordsState extends State<Records> {
                 );
               },
             ),
-            // ...... other list children.
           ],
         ),
       ),

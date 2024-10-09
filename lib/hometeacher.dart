@@ -59,24 +59,24 @@ class _homepageteacherState extends State<homepageteacher> {
         },
         customBottomBarItems: [
           CustomBottomBarItems(
+            assetsImagePath: "assets/icons/home.png",
             label: 'Home',
-            icon: (Icons.home),
-            isAssetsImage: false,
+            isAssetsImage: true,
           ),
           CustomBottomBarItems(
             label: 'Records',
-            icon: Icons.import_contacts_outlined,
-            isAssetsImage: false,
+            assetsImagePath: "assets/icons/book.png",
+            isAssetsImage: true,
           ),
           CustomBottomBarItems(
             label: 'Attendence',
-            icon: Icons.check_circle_outline,
-            isAssetsImage: false,
+            assetsImagePath: "assets/icons/attendance.png",
+            isAssetsImage: true,
           ),
           CustomBottomBarItems(
             label: 'Events',
-            icon: Icons.calendar_today_rounded,
-            isAssetsImage: false,
+            assetsImagePath: "assets/icons/events.png",
+            isAssetsImage: true,
           ),
         ],
       ),

@@ -1,5 +1,6 @@
 import 'dart:convert'; // For JSON encoding and decoding
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:projectfinal/studentnotsubmitted.dart';
 import 'package:projectfinal/studentsubmitted.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,6 +14,8 @@ class Assignments extends StatefulWidget {
 
 class _AssignmentsState extends State<Assignments> {
   List<Map<String, dynamic>> _assignments = [];
+  String currentDate =
+      DateFormat.MMMd().format(DateTime.now()); // Use current date format
 
   @override
   void initState() {
@@ -32,16 +35,23 @@ class _AssignmentsState extends State<Assignments> {
             assignmentsList.map((e) => Map<String, dynamic>.from(e)).toList();
       });
     } else {
-      // If no assignments are found, use default assignments
       _assignments = [
         {
-          'date': 'Nov 14',
+          'date': currentDate,
           'title': 'Science role in modern warfare',
           'deadline': 'Nov 14, 12:30 PM',
           'grade': '',
-          'status': 'not Submitted',
+          'status': 'Not Submitted',
+        },
+        {
+          'date': currentDate,
+          'title': 'Science role in modern warfare',
+          'deadline': 'Nov 14, 12:30 PM',
+          'grade': '',
+          'status': 'Submitted',
         },
       ];
+      print(_assignments);
       _saveAssignments();
     }
   }
@@ -129,7 +139,7 @@ class _AssignmentsState extends State<Assignments> {
                                   MaterialPageRoute(
                                       builder: (context) =>
                                           SocialSubmitted())); // Ensure this is correct
-                            } else {
+                            } else if (assignment['status'] == 'Submitted') {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -182,7 +192,7 @@ class _AssignmentsState extends State<Assignments> {
                                         children: [
                                           Text("Grade"),
                                           Text(
-                                            assignment['grade'],
+                                            assignment['grade'] ?? 'N/A',
                                             style:
                                                 TextStyle(color: Colors.green),
                                           ),

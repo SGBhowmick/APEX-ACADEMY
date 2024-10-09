@@ -103,7 +103,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    ProfileDetails().initializeProfile();
     _loadProfile();
   }
 
@@ -222,7 +221,10 @@ class _LoginPageState extends State<LoginPage> {
                         Color.fromARGB(255, 214, 163, 10),
                       ),
                     ),
-                    onPressed: login,
+                    onPressed: () async {
+                      ProfileDetails().initializeProfile();
+                      await login();
+                    },
                     child: Text(
                       'Login',
                       style: TextStyle(color: Colors.black, fontSize: 18),

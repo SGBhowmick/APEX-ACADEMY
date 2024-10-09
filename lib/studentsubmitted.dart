@@ -8,7 +8,7 @@ import 'package:projectfinal/studentnotsubmitted.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SocialSubmitted extends StatefulWidget {
-  const SocialSubmitted({super.key});
+  const SocialSubmitted({Key? key}) : super(key: key);
 
   @override
   State<SocialSubmitted> createState() => _SocialSubmittedState();
@@ -21,14 +21,13 @@ class _SocialSubmittedState extends State<SocialSubmitted> {
   @override
   void initState() {
     super.initState();
-    _selectedsubject();
+    _selectedSubject();
   }
 
-  Future<void> _selectedsubject() async {
+  Future<void> _selectedSubject() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      String selectedsubject = prefs.getString('subject') ?? '';
-      subjects = selectedsubject;
+      subjects = prefs.getString('subject') ?? '';
     });
   }
 
@@ -39,7 +38,7 @@ class _SocialSubmittedState extends State<SocialSubmitted> {
       allowedExtensions: ['pdf'],
     );
 
-    if (result != null) {
+    if (result != null && result.paths.isNotEmpty) {
       setState(() {
         _files = result.paths.map((path) => File(path!)).toList();
       });
@@ -67,7 +66,6 @@ class _SocialSubmittedState extends State<SocialSubmitted> {
             storage.ref().child('uploads/$subjects/assignments/$fileName');
 
         UploadTask uploadTask = ref.putFile(file);
-
         TaskSnapshot snapshot = await uploadTask;
 
         String downloadUrl = await snapshot.ref.getDownloadURL();
@@ -87,7 +85,9 @@ class _SocialSubmittedState extends State<SocialSubmitted> {
     );
     setState(() {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => notSubmitted()));
+        context,
+        MaterialPageRoute(builder: (context) => notSubmitted()),
+      );
     });
   }
 
@@ -107,13 +107,13 @@ class _SocialSubmittedState extends State<SocialSubmitted> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => Selectedsubjectpage()),
+              MaterialPageRoute(builder: (context) => SelectedSubjectPage()),
             );
           },
         ),
         backgroundColor: Color.fromARGB(255, 229, 224, 172),
         title: const Text(
-          'Social role in modern',
+          'Social Role in Modern',
           style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
         ),
       ),
@@ -148,7 +148,7 @@ class _SocialSubmittedState extends State<SocialSubmitted> {
                 Positioned(
                   child: Center(
                     child: Container(
-                      margin: EdgeInsets.only(left: 18, right: 18),
+                      margin: EdgeInsets.symmetric(horizontal: 18),
                       height: 110,
                       child: Center(
                         child: Row(
@@ -165,7 +165,6 @@ class _SocialSubmittedState extends State<SocialSubmitted> {
                             ),
                             Expanded(
                               child: Container(
-                                width: double.infinity,
                                 margin: EdgeInsets.only(right: 4),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
@@ -185,13 +184,13 @@ class _SocialSubmittedState extends State<SocialSubmitted> {
                                         ),
                                       ),
                                       Text(
-                                        "Science Role in modern warfare",
+                                        "Science Role in Modern Warfare",
                                         style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      Text("10.30"),
+                                      Text("10:30"),
                                       Text("Nov 17"),
                                     ],
                                   ),
@@ -223,7 +222,6 @@ class _SocialSubmittedState extends State<SocialSubmitted> {
                   Container(
                     height: 300,
                     child: ListView.builder(
-                      scrollDirection: Axis.vertical,
                       itemCount: _files.length,
                       itemBuilder: (context, index) {
                         return Container(
@@ -267,7 +265,6 @@ class _SocialSubmittedState extends State<SocialSubmitted> {
         color: Colors.white,
         child: Container(
           margin: EdgeInsets.all(10),
-          width: double.infinity,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
